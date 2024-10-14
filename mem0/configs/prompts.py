@@ -32,16 +32,16 @@ Input: There are branches in trees.
 Output: {{"facts" : []}}
 
 Input: Hi, I am looking for a restaurant in San Francisco.
-Output: {{"facts" : ["Looking for a restaurant in San Francisco"]}}
+Output: {{"facts" : ["The user is looking for a restaurant in San Francisco."]}}
 
 Input: Yesterday, I had a meeting with John at 3pm. We discussed the new project.
-Output: {{"facts" : ["Had a meeting with John at 3pm", "Discussed the new project"]}}
+Output: {{"facts" : ["The user had a meeting with John at 3pm yesterday.", "The user discussed the new project with John."]}}
 
 Input: Hi, my name is John. I am a software engineer.
-Output: {{"facts" : ["Name is John", "Is a Software engineer"]}}
+Output: {{"facts" : ["The user's name is John.", "John is a software engineer."]}}
 
 Input: Me favourite movies are Inception and Interstellar.
-Output: {{"facts" : ["Favourite movies are Inception and Interstellar"]}}
+Output: {{"facts" : ["The user's favorite movies are Inception and Interstellar."]}}
 
 Return the facts and preferences in a json format as shown above.
 
@@ -53,10 +53,13 @@ Remember the following:
 - If you do not find anything relevant in the below conversation, you can return an empty list.
 - Create the facts based on the user and assistant messages only. Do not pick anything from the system messages.
 - Make sure to return the response in the format mentioned in the examples. The response should be in json with a key as "facts" and corresponding value will be a list of strings.
+- Ensure that each extracted fact is a complete sentence that can stand alone without requiring context from previous messages or other concepts.
+- Use the user's name or "The user" at the beginning of each fact to provide context.
+- Convert any first-person statements to third-person statements about the user.
 
 Following is a conversation between the user and the assistant. You have to extract the relevant facts and preferences from the conversation and return them in the json format as shown above.
 You should detect the language of the user input and record the facts in the same language.
-If you do not find anything relevant facts, user memories, and preferences in the below conversation, you can return an empty list corresponding to the "facts" key.
+If you do not find any relevant facts, user memories, and preferences in the below conversation, you can return an empty list corresponding to the "facts" key.
 """
 
 
@@ -101,8 +104,8 @@ def get_update_memory_messages(retrieved_old_memory_dict, response_content):
 
                 }}
 
-    2. **Update**: If the retrieved facts contain information that is already present in the memory but the information is totally different, then you have to update it. 
-        If the retrieved fact contains information that conveys the same thing as the elements present in the memory, then you have to keep the fact which has the most information. 
+    2. **Update**: If the retrieved facts contain information that is already present in the memory but the information is totally different, then you have to update it.
+        If the retrieved fact contains information that conveys the same thing as the elements present in the memory, then you have to keep the fact which has the most information.
         Example (a) -- if the memory contains "User likes to play cricket" and the retrieved fact is "Loves to play cricket with friends", then update the memory with the retrieved facts.
         Example (b) -- if the memory contains "Likes cheese pizza" and the retrieved fact is "Loves cheese pizza", then you do not need to update it because they convey the same information.
         If the direction is to update the memory, then you have to update it.
@@ -343,12 +346,12 @@ RESTRICT_FACT_RETRIEVAL_PROMPT = f"""You are a Personal Information Organizer, s
 
 Here are some few shot examples:
 
-Categories: 
+Categories:
 "cooking": "For users interested in cooking, including recipes, cooking tips, and culinary experiences."
 Input:  Hi.
 Output: {{"facts" : []}}
 
-Categories: 
+Categories:
 "fitness": "Includes content related to fitness, such as workouts, exercises, and fitness tips."
 Input: There are branches in trees.
 Output: {{"facts" : []}}
